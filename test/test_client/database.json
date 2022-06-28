@@ -1,0 +1,173 @@
+{
+    "object": "database",
+    "id": "050558db-be76-41ad-b973-30896383682f",
+    "cover": null,
+    "icon": {
+        "type": "emoji",
+        "emoji": "🌓"
+    },
+    "created_time": "2021-11-30T02:48:00.000Z",
+    "created_by": {
+        "object": "user",
+        "id": "55be79e7-0853-4ef4-a5ec-193f890dd119"
+    },
+    "last_edited_by": {
+        "object": "user",
+        "id": "55be79e7-0853-4ef4-a5ec-193f890dd119"
+    },
+    "last_edited_time": "2022-06-19T17:43:00.000Z",
+    "title": [
+        {
+            "type": "text",
+            "text": {
+                "content": "EveningStudy",
+                "link": null
+            },
+            "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+            },
+            "plain_text": "EveningStudy",
+            "href": null
+        }
+    ],
+    "description": [],
+    "is_inline": true,
+    "properties": {
+        "updateTime": {
+            "id": "Fx~S",
+            "name": "updateTime",
+            "type": "last_edited_time",
+            "last_edited_time": {}
+        },
+        "tags": {
+            "id": "Hcmh",
+            "name": "tags",
+            "type": "multi_select",
+            "multi_select": {
+                "options": [
+                    {
+                        "id": "d9b19000-1eaf-4352-a987-fec93770acbf",
+                        "name": "develop",
+                        "color": "green"
+                    },
+                    {
+                        "id": "97e2f175-0a2d-47a2-a2c5-7d9ab7038f1d",
+                        "name": "learn",
+                        "color": "yellow"
+                    },
+                    {
+                        "id": "79aa637b-cb58-49eb-99e5-ab61caa88b52",
+                        "name": "other",
+                        "color": "blue"
+                    },
+                    {
+                        "id": "24209086-1302-45a7-a2e4-d951e6cd0122",
+                        "name": "opensource",
+                        "color": "default"
+                    },
+                    {
+                        "id": "dfb962ec-18a8-4f34-bf79-9924f266749e",
+                        "name": "design",
+                        "color": "purple"
+                    },
+                    {
+                        "id": "73a79757-4d2c-4044-a2e2-85a745125a9b",
+                        "name": "tools",
+                        "color": "pink"
+                    },
+                    {
+                        "id": "127297dd-2ce9-4a38-ab6c-4bf367a18c64",
+                        "name": "writing",
+                        "color": "orange"
+                    }
+                ]
+            }
+        },
+        "Status": {
+            "id": "IzYk",
+            "name": "Status",
+            "type": "select",
+            "select": {
+                "options": [
+                    {
+                        "id": "1",
+                        "name": "准备中",
+                        "color": "red"
+                    },
+                    {
+                        "id": "2",
+                        "name": "进行中",
+                        "color": "yellow"
+                    },
+                    {
+                        "id": "3",
+                        "name": "已完成",
+                        "color": "green"
+                    },
+                    {
+                        "id": "8fe17c26-1173-4f48-82c8-b9fe001487c6",
+                        "name": "归档",
+                        "color": "default"
+                    },
+                    {
+                        "id": "753a9b1b-03ac-4d81-b7a2-6ef0cb168631",
+                        "name": "取消",
+                        "color": "purple"
+                    },
+                    {
+                        "id": "1477ac0e-af9a-4b79-8136-79d18f4d8429",
+                        "name": "受阻",
+                        "color": "pink"
+                    }
+                ]
+            }
+        },
+        "id": {
+            "id": "Kay%3A",
+            "name": "id",
+            "type": "formula",
+            "formula": {
+                "expression": "id()"
+            }
+        },
+        "createTime": {
+            "id": "RmAA",
+            "name": "createTime",
+            "type": "created_time",
+            "created_time": {}
+        },
+        "taskTime": {
+            "id": "lCt%60",
+            "name": "taskTime",
+            "type": "date",
+            "date": {}
+        },
+        "parent": {
+            "id": "qu%5EG",
+            "name": "parent",
+            "type": "relation",
+            "relation": {
+                "database_id": "050558db-be76-41ad-b973-30896383682f",
+                "synced_property_name": "parent",
+                "synced_property_id": "qu^G"
+            }
+        },
+        "Name": {
+            "id": "title",
+            "name": "Name",
+            "type": "title",
+            "title": {}
+        }
+    },
+    "parent": {
+        "type": "page_id",
+        "page_id": "662f19d8-8f3b-4afe-a9ca-cbbb91b76b0e"
+    },
+    "url": "https://www.notion.so/050558dbbe7641adb97330896383682f",
+    "archived": false
+}

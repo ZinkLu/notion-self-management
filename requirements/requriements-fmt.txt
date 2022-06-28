@@ -1,0 +1,5 @@
+
+yapf==0.32.0
+isort==5.10.1
+pipdeptree==2.2.1
+  - pip [required: >=6.0.0, installed: 22.1.2]
