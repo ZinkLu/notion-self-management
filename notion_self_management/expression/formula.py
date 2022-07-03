@@ -1,4 +1,4 @@
-from typing import Any, Generic, Iterable, TypeVar, Union
+from typing import Any, Generic, Iterable, TypeVar, Union, Callable
 
 from notion_self_management.expression.expression import Expression
 

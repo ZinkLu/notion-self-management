@@ -102,6 +102,9 @@ class Condition(Expression):
         return eval_value
 
     def evaluate(self, **values: BasicValue) -> bool:
+        """
+        evaluate on a binary
+        """
         from notion_self_management.expression.variable import Variable
         eval_left, eval_right = self.left, self.right
 
