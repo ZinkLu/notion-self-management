@@ -20,3 +20,9 @@ python3.8+
 
 ## 3. Installation
 
+
+## 4. Modules
+
+![Modules](docs/static/notionManager.drawio.png)
+
+> This project is under heavy constructions any break changes may occur.
