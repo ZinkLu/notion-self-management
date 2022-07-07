@@ -1,6 +1,7 @@
 from ast import List
 from typing import Any, Iterable, Type, TypeVar, Union
 
+from notion_self_management.expression.base_variable import BaseVariable
 from notion_self_management.expression.bind import BindVariable
 from notion_self_management.expression.bool_expression import Condition
 from notion_self_management.expression.expression import Expression
@@ -8,7 +9,7 @@ from notion_self_management.expression.formula import BasicValue, Formula
 from notion_self_management.expression.ops import BoolOperator
 
 
-class Variable:
+class Variable(BaseVariable):
     """
     Variable class represent a variable, like `a`.
 
@@ -19,16 +20,6 @@ class Variable:
 
     Variable can be seen as a Column in Table.
     """
-
-    def __init__(self, type: Type, name: str = "") -> None:
-        """
-        :param name: Name of the variable, like `create_time`
-        :param type: Type of the variable it could be any basic python
-                     type such as Dict, List, set...
-        """
-        self.name = name
-        self.type = type
-        super().__init__()
 
     # assignment will get a assignment expression which can be compute later
     def bind(self, value: BasicValue) -> BindVariable:

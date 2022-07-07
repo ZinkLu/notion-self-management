@@ -1,6 +1,7 @@
 from collections import OrderedDict, deque
 from typing import Any, List, Optional, Tuple, TypeVar, Union
 
+from notion_self_management.expression.base_variable import BaseVariable
 from notion_self_management.expression.const import empty, false, true
 from notion_self_management.expression.expression import Expression
 from notion_self_management.expression.formula import BasicValue, Value
@@ -17,8 +18,8 @@ class Condition(Expression):
     def __init__(
         self,
         op: BoolOperator,
-        left: Union[BasicValue, "Variable"],
-        right: Union[BasicValue, "Variable"],
+        left: Union[BasicValue, "BaseVariable"],
+        right: Union[BasicValue, "BaseVariable"],
     ):
         """
         Condition is a bool binary operation like `a == 1`
@@ -95,7 +96,7 @@ class Condition(Expression):
         return Condition(BoolOperatorInv[self.op], self.left, self.right)
 
     @staticmethod
-    def _get_variable_bind(v: "Variable", values: dict):
+    def _get_variable_bind(v: "BaseVariable", values: dict):
         eval_value = values.get(v.name, empty)
         if eval_value is empty:
             raise ValueError(f"variable {v.name} is unbound during compute")
