@@ -1,26 +1,21 @@
-from collections import OrderedDict, deque
-from typing import Any, List, Optional, Tuple, TypeVar, Union
+import operator as op
+from typing import List, TypeVar, Union
 
-from notion_self_management.expression.base_variable import BaseVariable
-from notion_self_management.expression.const import empty, false, true
-from notion_self_management.expression.expression import Expression
-from notion_self_management.expression.formula import BasicValue, Value
-from notion_self_management.expression.ops import BoolOperator, BoolOperatorInv, LogicalOperator
-from typing_extensions import Self
+from notion_self_management.expression.const import false, true
+from notion_self_management.expression.formula import BasicValue, Formula, Value
 
 ConstClass = TypeVar('ConstClass', true, false)
 
 ConditionType = Union["Condition", "ConditionList", true, false, ConstClass]
 
 
-class Condition(Expression):
+class Condition(Formula):
 
-    def __init__(
-        self,
-        op: BoolOperator,
-        left: Union[BasicValue, "BaseVariable"],
-        right: Union[BasicValue, "BaseVariable"],
-    ):
+    return_type = bool
+    arg_types = [BasicValue, BasicValue]
+    func = bool
+
+    def __init__(self, *args_variables: Value):
         """
         Condition is a bool binary operation like `a == 1`
         Where `a` is a Variable class and `1` is a true value.
@@ -30,16 +25,8 @@ class Condition(Expression):
 
         a bool binary operation always have a left and right
         """
-        self.op = op
-        self.left = left
-        self.right = right
-
-    def to_json(self) -> str:
-        return super().to_json()
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return super().from_json(json_str)
+        super().__init__(*args_variables)
+        self._inv = False
 
     def __and__(self, other: ConditionType) -> "ConditionList":
         """
@@ -56,7 +43,7 @@ class Condition(Expression):
         condition_list = (a == 1) & (b == 1)
         ```
         """
-        return ConditionList(LogicalOperator.and_, [self, other])
+        return All([self, other])
 
     def __or__(self, other: ConditionType) -> "ConditionList":
         """
@@ -73,7 +60,7 @@ class Condition(Expression):
         condition_list = (a == 1) | (b == 1)
         ```
         """
-        return ConditionList(LogicalOperator.or_, [self, other])
+        return Any([self, other])
 
     def __invert__(self) -> "Condition":
         """
@@ -92,38 +79,53 @@ class Condition(Expression):
         """
         return self.not_()
 
+    def evaluate(self, **kwargs) -> bool:
+        res = super().evaluate(**kwargs)
+        return (not res) if self._inv else res
+
     def not_(self) -> "Condition":
-        return Condition(BoolOperatorInv[self.op], self.left, self.right)
-
-    @staticmethod
-    def _get_variable_bind(v: "BaseVariable", values: dict):
-        eval_value = values.get(v.name, empty)
-        if eval_value is empty:
-            raise ValueError(f"variable {v.name} is unbound during compute")
-        return eval_value
-
-    def evaluate(self, **values: BasicValue) -> bool:
-        """
-        evaluate on a binary
-        """
-        from notion_self_management.expression.variable import Variable
-        eval_left, eval_right = self.left, self.right
-
-        if isinstance(eval_right, Variable):
-            eval_right = self._get_variable_bind(eval_right, values)
-
-        if isinstance(eval_left, Variable):
-            eval_left = self._get_variable_bind(eval_left, values)
-
-        return self.op.value(eval_left, eval_right)
-
-    def __str__(self) -> str:
-        return f"{self.left} {self.op} {self.right}"
+        kls = BoolOperatorInv.get(self.__class__, None)  # type: ignore # noqa
+        if kls:
+            return kls(*self.args)
+        instance = self.__class__(*self.args)
+        instance._inv = not self._inv
+        return instance
 
 
-class ConditionList(Expression):
+class Eq(Condition):
+    func = op.eq
 
-    def __init__(self, op: LogicalOperator, clauses: List[ConditionType]) -> None:
+
+class Ne(Condition):
+    func = op.ne
+
+
+class Gt(Condition):
+    func = op.gt
+
+
+class Ge(Condition):
+    func = op.ge
+
+
+class Lt(Condition):
+    func = op.lt
+
+
+class Le(Condition):
+    func = op.le
+
+
+class Contains(Condition):
+    func = op.contains
+
+
+class ConditionList(Formula):
+    return_type = bool
+    arg_types = [List[ConditionType]]
+    func = lambda *args: True  # noqa
+
+    def __init__(self, clauses: List[ConditionType]) -> None:
         """
         a condition list is a bool expression but must have the same operator,
         such as `a & b & c & d` or `a | b | c | d`
@@ -136,16 +138,8 @@ class ConditionList(Expression):
         :param clauses: a condition list
         :type clauses: List[ConditionType]
         """
-        self.op = op
-        self.clauses = clauses
+        self.args = clauses
         self._inv = False
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return super().from_json(json_str)
-
-    def to_json(self) -> str:
-        return super().to_json()
 
     def evaluate(self, **values) -> bool:
         """
@@ -157,12 +151,7 @@ class ConditionList(Expression):
         :return: logical expression result.
         :rtype: bool
         """
-        res = False
-        if self.op == LogicalOperator.and_:
-            res = all((c.evaluate(**values) for c in self.clauses))
-        elif self.op == LogicalOperator.or_:
-            res = any((c.evaluate(**values) for c in self.clauses))
-
+        res = self.func((c.evaluate(**values) for c in self.args))
         return (not res) if self._inv else res
 
     def __and__(self, other: ConditionType) -> "ConditionList":
@@ -181,24 +170,32 @@ class ConditionList(Expression):
         # a = 1 and ( b = 1 or a = 2) and b = 2
         ```
         """
-        return ConditionList(LogicalOperator.and_, [self, other])
+        return All([self, other])
 
     def __or__(self, other: ConditionType) -> ConditionType:
         """
         See `ConditionList.__and__`
         """
-        return ConditionList(LogicalOperator.or_, [self, other])
+        return Any([self, other])
 
     def not_(self):
-        ins = ConditionList(self.op, self.clauses)
-        ins._inv = True
+        ins = self.__class__(self.args)
+        ins._inv = not self._inv
         return ins
 
     def __invert__(self):
         return self.not_()
 
     def __str__(self) -> str:
-        return f"{self._inv and 'not' or ''}{self.clauses}"
+        return f"{self._inv and 'not' or ''}{self.args}"
+
+
+class All(ConditionList):
+    func = all
+
+
+class Any(ConditionList):
+    func = any
 
 
 def and_(*args: ConditionType) -> ConditionList:
@@ -220,8 +217,7 @@ def and_(*args: ConditionType) -> ConditionList:
     arg = list(args)
     if len(args) == 1:
         arg.insert(0, true)
-
-    return ConditionList(LogicalOperator.and_, arg)
+    return All(arg)
 
 
 def or_(*args: ConditionType) -> ConditionList:
@@ -242,5 +238,14 @@ def or_(*args: ConditionType) -> ConditionList:
     arg = list(args)
     if len(args) == 1:
         arg.insert(0, false)
+    return Any(arg)
 
-    return ConditionList(LogicalOperator.or_, list(args))
+
+BoolOperatorInv = {
+    Eq: Ne,
+    Ne: Eq,
+    Gt: Lt,
+    Lt: Gt,
+    Ge: Le,
+    Le: Ge,
+}

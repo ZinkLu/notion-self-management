@@ -1,8 +1,5 @@
 from dataclasses import fields, dataclass
-from types import MappingProxyType
 
-from typing import Type, TypeVar
-from notion_self_management.expression.bool_expression import Condition
 
 from notion_self_management.expression.variable import Variable
 

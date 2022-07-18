@@ -1,12 +1,8 @@
-from ast import List
-from typing import Any, Iterable, Type, TypeVar, Union
 
 from notion_self_management.expression.base_variable import BaseVariable
 from notion_self_management.expression.bind import BindVariable
-from notion_self_management.expression.bool_expression import Condition
-from notion_self_management.expression.expression import Expression
+from notion_self_management.expression.bool_expression import Condition, Eq, Ne, Gt, Ge, Lt, Le
 from notion_self_management.expression.formula import BasicValue, Formula
-from notion_self_management.expression.ops import BoolOperator
 
 
 class Variable(BaseVariable):
@@ -49,19 +45,19 @@ class Variable(BaseVariable):
 
     # bool will return Condition
     def __eq__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.eq, self, __o)
+        return Eq(self, __o)
 
     def __gt__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.gt, self, __o)
+        return Gt(self, __o)
 
     def __ge__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.ge, self, __o)
+        return Ge(self, __o)
 
     def __lt__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.lt, self, __o)
+        return Lt(self, __o)
 
     def __le__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.le, self, __o)
+        return Le(self, __o)
 
     def __ne__(self, __o: object) -> Condition:
-        return Condition(BoolOperator.ne, self, __o)
+        return Ne(self, __o)

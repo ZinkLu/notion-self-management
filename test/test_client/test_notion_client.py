@@ -12,6 +12,6 @@ def notion_key() -> str:
 def notion_database_id() -> str:
     return os.environ.get("NOTION_DATABASE_ID") or ""
 
-
+@mark.skip
 async def test_client(notion_key, notion_database_id):
     notion = await Notion(notion_key, notion_database_id)

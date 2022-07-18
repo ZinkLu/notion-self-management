@@ -3,7 +3,8 @@ from datetime import datetime
 from io import StringIO
 from typing import Union
 
-from notion_self_management.expression.bool_expression import Condition, ConditionList, and_, or_
+from notion_self_management.expression.bool_expression import Condition, ConditionList
+from notion_self_management.expression.formula import Concat, Replace
 from notion_self_management.expression.utils import dataclass_filter
 from notion_self_management.expression.variable import Variable
 
@@ -48,6 +49,17 @@ def test_not():
     assert (~f2).evaluate(**book_dic)
     assert (f1 & f2).not_().evaluate(**book_dic)
     assert not (~(f1 | f2)).evaluate(**book_dic)
+
+
+def test_formula():
+    book = Book(name="Python", author="Lu", publish_date=datetime.now())
+    f1 = Concat(Book.name, Book.author)
+    result = f1.evaluate(**asdict(book))
+    assert result == "PythonLu"
+
+    f2 = Replace(Book.name, "Python", "Java")
+    result = f2.evaluate(**asdict(book))
+    assert result == "Java"
 
 
 def to_sql(expression):

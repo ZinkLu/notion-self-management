@@ -1,5 +1,5 @@
 from typing import Type
-from typing_extensions import Self
+
 from notion_self_management.expression.expression import Expression
 
 
@@ -14,10 +14,3 @@ class BaseVariable(Expression):
         self.name = name
         self.type = type
         super().__init__()
-
-    def to_json(self) -> str:
-        return super().to_json()
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return super().from_json(json_str)

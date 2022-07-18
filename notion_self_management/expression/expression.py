@@ -1,10 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any
 
 from typing_extensions import Self
 
 
-class Expression(ABC):
+class Expression:
     """
     Expression Class
     An expression can be one of these sub expression:

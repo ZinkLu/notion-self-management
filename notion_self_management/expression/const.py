@@ -1,8 +1,7 @@
-from notion_self_management.expression.expression import Expression
-from typing_extensions import Self
+from notion_self_management.expression.base_variable import BaseVariable
 
 
-class Const(Expression):
+class Const(BaseVariable):
 
     def __new__(cls, *args, **kwargs):
         """Const is a singleton"""
@@ -10,28 +9,32 @@ class Const(Expression):
             cls.instance = super().__new__(cls)
         return cls.instance
 
-    def to_json(self) -> str:
-        return super().to_json()
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Self:
-        return super().from_json(json_str)
+    def __init__(self) -> None:
+        return
 
 
 class true(Const):
+    name = "true"
+    type = bool
 
     def evaluate(self, *args, **kwargs) -> bool:
         return True
 
 
 class false(Const):
+    name = "false"
+    type = bool
 
     def evaluate(self, *args, **kwargs) -> bool:
         return False
 
 
 class empty(Const):
-    ...
+    name = "false"
+    type = bool
+
+    def evaluate(self, *args, **kwargs) -> None:
+        return
 
 
 if __name__ == "__main__":
