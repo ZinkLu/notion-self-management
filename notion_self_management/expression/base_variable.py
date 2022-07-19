@@ -1,6 +1,6 @@
 from typing import Type
 
-from notion_self_management.expression.expression import Expression
+from notion_self_management.expression.base import Expression
 
 
 class BaseVariable(Expression):
@@ -14,3 +14,15 @@ class BaseVariable(Expression):
         self.name = name
         self.type = type
         super().__init__()
+
+
+class Const(BaseVariable):
+
+    def __new__(cls, *args, **kwargs):
+        """Const is a singleton"""
+        if getattr(cls, "instance", None) is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
+    def __init__(self) -> None:
+        return

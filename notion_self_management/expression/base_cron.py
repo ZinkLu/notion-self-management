@@ -1,4 +1,4 @@
-from notion_self_management.expression.expression import Expression
+from notion_self_management.expression.base import Expression
 
 
 class Cron(Expression):

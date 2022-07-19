@@ -1,6 +1,6 @@
 from typing import Generic, List, Optional, TypeVar
 
-from notion_self_management.expression.bool_expression import ConditionType
+from notion_self_management.expression.base_condition import ConditionType
 from notion_self_management.expression.variable import Variable
 from notion_self_management.task_manager.note import Note
 from notion_self_management.task_manager.task import Task

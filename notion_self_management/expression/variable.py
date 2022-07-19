@@ -1,8 +1,6 @@
-
+from notion_self_management.expression.base_formula import Formula
 from notion_self_management.expression.base_variable import BaseVariable
-from notion_self_management.expression.bind import BindVariable
-from notion_self_management.expression.bool_expression import Condition, Eq, Ne, Gt, Ge, Lt, Le
-from notion_self_management.expression.formula import BasicValue, Formula
+from notion_self_management.expression.conditions import Condition, Eq, Ge, Gt, Le, Lt, Ne
 
 
 class Variable(BaseVariable):
@@ -16,19 +14,6 @@ class Variable(BaseVariable):
 
     Variable can be seen as a Column in Table.
     """
-
-    # assignment will get a assignment expression which can be compute later
-    def bind(self, value: BasicValue) -> BindVariable:
-        """
-        assign a valid value to this variable.
-        """
-        if isinstance(value, Formula):
-            if self.type != value.return_type:
-                raise TypeError(f"Can't set variable {self.name} to type {value.return_type}")
-        elif self.type != type(value):
-            raise TypeError(f"Can't set variable {self.name} to type {type(value)}")
-
-        return BindVariable(self.name, value)
 
     # arithmetic will return a formula
     def __add__(self) -> Formula:

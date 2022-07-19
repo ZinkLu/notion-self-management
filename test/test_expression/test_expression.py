@@ -3,7 +3,7 @@ from datetime import datetime
 from io import StringIO
 from typing import Union
 
-from notion_self_management.expression.bool_expression import Condition, ConditionList
+from notion_self_management.expression.conditions import Condition, ConditionList
 from notion_self_management.expression.formula import Concat, Replace
 from notion_self_management.expression.utils import dataclass_filter
 from notion_self_management.expression.variable import Variable
