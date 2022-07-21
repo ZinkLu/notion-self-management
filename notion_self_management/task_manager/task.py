@@ -6,6 +6,7 @@ from notion_self_management.expression.utils import dataclass_filter
 
 
 @dataclass_filter
+@dataclass
 class Task:
     task_id: str
 
@@ -19,7 +20,7 @@ class Task:
     status: str
     due_date: datetime
     start_date: datetime
-    Tags: List[str]
+    tags: List[str]
     is_done: bool
     active: bool
     percent: int

@@ -80,8 +80,9 @@ class TaskManager:
         """
         t = await self._update_task(task)
         if not t:
+            print(t)
             return
-        return self.take_note(t)
+        return await self.take_note(t)
 
     async def delete_task(self, task: Task) -> Optional[Note]:
         """
@@ -185,7 +186,6 @@ class TaskManager:
         note = Note(version=self._get_notes_version(),
                     note_time=datetime.datetime.now(),
                     previous=previous,
-                    following=None,
                     **asdict(task))  # type: ignore
 
         if previous is not None:

@@ -16,3 +16,5 @@ if env.exists():
         l = l.strip()
         k, v = l.split("=")
         os.environ[k] = v
+
+from test_client.fixtures import *

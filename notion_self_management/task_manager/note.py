@@ -7,6 +7,7 @@ from notion_self_management.task_manager.task import Task
 
 
 @dataclass_filter
+@dataclass
 class Note(Task):
     """
     if task be modify with a existing following,
