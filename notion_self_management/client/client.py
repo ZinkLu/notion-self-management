@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, TypeVar
+from typing import List, Optional, Protocol, TypeVar
 
 from notion_self_management.expression.base_condition import ConditionType
 from notion_self_management.expression.variable import Variable
@@ -8,7 +8,7 @@ from notion_self_management.task_manager.task import Task
 T = TypeVar("T", Note, Task)
 
 
-class Client(Generic[T]):
+class Client(Protocol[T]):
 
     async def create(self, t: T) -> T:
         return NotImplemented
@@ -36,5 +36,10 @@ class Client(Generic[T]):
     ) -> List[T]:
         return NotImplemented
 
-    async def lists_all(self, conditions: ConditionType) -> List[T]:
+    async def lists_all(
+        self,
+        conditions: ConditionType,
+        order_by=None,
+        desc=None,
+    ) -> List[T]:
         return NotImplemented

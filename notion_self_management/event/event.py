@@ -1,12 +1,11 @@
-from contextvars import ContextVar
 from inspect import isawaitable
-from typing import Any, Callable, TypedDict
+from typing import Any, Callable
 from weakref import WeakSet
 
 from notion_self_management.task_manager.note import Note
 
 
-class Event:
+class TaskEvent:
 
     def __init__(self, name) -> None:
         self.name = name
@@ -18,6 +17,7 @@ class Event:
         as it's only argument.
         """
         self.handlers.add(handler)
+        return handler
 
     async def emit(self, note: Note):
         """

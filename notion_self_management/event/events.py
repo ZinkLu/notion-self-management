@@ -1,5 +1,5 @@
-from notion_self_management.event.event import Event
+from notion_self_management.event.event import TaskEvent
 
-create_task = Event("event")
-update_task = Event("event")
-delete_task = Event("event")
+create_task_event = TaskEvent("event")
+update_task_event = TaskEvent("event")
+delete_task_event = TaskEvent("event")

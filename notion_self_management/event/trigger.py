@@ -1,6 +1,6 @@
 from typing import List, Optional, TypeVar
 
-from notion_self_management.event.events import create_task, update_task, delete_task
+from notion_self_management.event.events import create_task_event, update_task_event, delete_task_event
 from notion_self_management.task_manager.note import Note
 from notion_self_management.task_manager.task import Task
 from notion_self_management.task_manager.task_manager import TaskManager
@@ -26,24 +26,34 @@ class Trigger:
     ) -> None:
         self.task_manager = task_manager
 
+    async def get_tasks(
+        self,
+        condition,
+        limit=None,
+        offset=None,
+        order_by=None,
+        desc=None,
+    ):
+        return await self.task_manager.get_tasks(condition, limit, offset, order_by, desc)
+
     async def get_task_by_id(self, task_id: str) -> Optional[Task]:
         return await self.task_manager.get_task_by_id(task_id)
 
     async def create_task(self, task: Task) -> Note:
         note = await self.task_manager.create_task(task)
-        await create_task.emit(note)
+        await create_task_event.emit(note)
         return note
 
     async def update_task(self, task: Task) -> Optional[Note]:
         note = await self.task_manager.update_task(task)
         if note is not None:
-            await update_task.emit(note)
+            await update_task_event.emit(note)
         return note
 
     async def delete_task(self, task: Task) -> Optional[Note]:
         note = await self.task_manager.update_task(task)
         if note is not None:
-            await delete_task.emit(note)
+            await delete_task_event.emit(note)
         return await self.task_manager.delete_task(task)
 
     # NOTES METHODS
@@ -65,10 +75,6 @@ class Trigger:
         check_dependency=True,
     ) -> bool:
         return await self.task_manager.delete_notes(notes, check_dependency)
-
-    def _trigger_event(self, method_name: str):
-        """Trigger event when calling specify method"""
-        ...
 
 
 def get_trigger(task_manager: TaskManager) -> TaskManager:

@@ -5,6 +5,8 @@ from dataclasses import asdict
 from typing import Callable, List, Optional
 
 from notion_self_management.client.client import Client
+from notion_self_management.expression.base_condition import ConditionType
+from notion_self_management.expression.conditions import Condition
 from notion_self_management.task_manager.note import Note
 from notion_self_management.task_manager.task import Task
 
@@ -52,6 +54,22 @@ class TaskManager:
         self.note_db = note_client
         self._maximum_notes = maximum_notes
         self._is_idempotent = idempotent_function
+
+    async def get_tasks(
+        self,
+        condition: ConditionType,
+        limit=None,
+        offset=None,
+        order_by=None,
+        desc=None,
+    ):
+        """
+        Get tasks by given condition
+        query all tasks when limit, offset is both None.
+        """
+        if all((limit is not None, offset is not None)):
+            return await self.task_db.lists(condition, limit, offset, order_by)
+        return await self.task_db.lists_all(condition, order_by, desc)
 
     async def get_task_by_id(self, task_id: str) -> Optional[Task]:
         """

@@ -10,8 +10,8 @@ from notion_self_management.task_manager.task_manager import TaskManager
 
 
 @pytest.fixture
-def dummy_task_manager():
-    return TaskManager(DummyClient(), DummyClient())
+def dummy_task_manager(dummy_task, dummy_note):
+    return TaskManager(DummyClient([dummy_task]), DummyClient([dummy_note]))
 
 
 @pytest.fixture
@@ -35,6 +35,10 @@ def dummy_task():
     )
 
 
+def get_notes(dummy_note):
+    return dummy_note
+
+
 @pytest.fixture()
 def dummy_note(dummy_task: Task):
     return Note(
@@ -45,7 +49,11 @@ def dummy_note(dummy_task: Task):
     )
 
 
-class DummyClient(Client[Note]):
+class DummyClient(Client):
+
+    def __init__(self, notes) -> None:
+        self.elements = notes
+        super().__init__()
 
     async def create(self, t: Note) -> Note:
         return t
@@ -61,7 +69,7 @@ class DummyClient(Client[Note]):
 
     # for get
     async def get(self, t_id: str) -> Optional[Note]:
-        return None
+        return self.elements[0]
 
     async def lists(
         self,
@@ -71,7 +79,7 @@ class DummyClient(Client[Note]):
         order_by=None,
         desc: bool = False,
     ) -> List[Note]:
-        return []
+        return self.elements
 
-    async def lists_all(self, conditions) -> List[Note]:
-        return []
+    async def lists_all(self, *args, **kwargs) -> List[Note]:
+        return self.elements
