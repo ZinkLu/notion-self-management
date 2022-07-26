@@ -98,7 +98,6 @@ class TaskManager:
         """
         t = await self._update_task(task)
         if not t:
-            print(t)
             return
         return await self.take_note(t)
 
@@ -158,10 +157,10 @@ class TaskManager:
 
     async def take_note(self, task: Task, previous_version: Optional[str] = None) -> Note:
         """
-        Take note is idempotent. Which means a task *only* can be
+        `take_note` is idempotent. Which means a task *only* can be
         noted if the idempotent function return `False`, otherwise,
         `take_note` will consider the Task is the same as current
-        Task.
+        Task in database.
 
         default idempotent function will check weather Task's
         `update_time` equals to latest Note's.

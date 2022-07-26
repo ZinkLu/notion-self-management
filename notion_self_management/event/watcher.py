@@ -3,6 +3,7 @@ import datetime
 import logging
 from threading import Thread
 
+from notion_self_management.event.events import create_task_event, delete_task_event, update_task_event
 from notion_self_management.task_manager.task import Task
 from notion_self_management.task_manager.task_manager import TaskManager
 
@@ -29,10 +30,16 @@ class Watcher:
         :param task_manager: instance of `notion_self_management.task_manager.task_manager.TaskManager`
         :param period: sleeping time during each poll, defaults to 5 second. This value can't be too
                        small in case to reach task_db's limit rate.
-        :param ensure_each_poll: In order to emit correct event, Watcher will take updated tasks and
-                                exists notes into comparison
-                                 
-        :param threaded:
+        :param ensure_each_poll: In order to emit correct event, Watcher will take all updated tasks
+                                and exists notes into comparison, which costs time. `ensure_each_poll`
+                                tells `Watcher` whether to wait for events or not. If `ensure_each_poll`
+                                is False, `Watcher` will only create `Future` and go to the next poll
+                                Immediately.
+                                **Warning**: Same event can be triggered multiple times if set to True.
+        :param threaded: If True,`Watcher` will start a new event loop and poll on another thread,
+                         otherwise `Watcher` will attach to current event loop, but won't start
+                         current event loop. You must call `asyncio.get_event_loop().run_forever()`
+                         manually if current loop is not running.
         """
         self.task_manager = task_manager
         self.period = period
@@ -43,8 +50,7 @@ class Watcher:
 
     def start_poll(self):
         """
-        `start_poll` will add `Watcher` into current event loop
-        and start tasks
+        start polling.
         """
         logger.debug(f"watcher {self} start to poll")
 
@@ -68,15 +74,54 @@ class Watcher:
 
     async def trigger_event(self, task: Task):
         """
-        :param task: _description_
+        `trigger_event` will check the task's notes and
+        emit correct event.
+
+        - emit `create_event` when no note related to the task.
+        - emit `update_task` when `task_manager._is_idempotent`
+                return False.
+        - emit `delete_task` when task is confirmed updated and
+               `task.is_active` is False while last note's is True.
         """
-        await asyncio.sleep(0)
+        exist_task = await self.task_manager.get_task_by_id(task.task_id)
+
+        # create
+        if exist_task:
+            note = await self.task_manager.take_note(task, None)
+            logger.debug(f"trigger create event for task {task}")
+            await create_task_event.emit(note)
+            return
+
+        note = await self.task_manager.update_task(task)
+        if not note:
+            logger.error(f"update event trigger failed cause no note related to task {task}")
+            return
+
+        # is update occur?
+        if self.task_manager._is_idempotent(task, note):
+            # no update occurs.
+            logger.info(f"task {task} is idempotent skipping..")
+            return
+
+        # update occurs
+        # delete
+        if note.previous is None or (previous := await self.task_manager.get_note(note.previous)) is None:
+            logger.error(f"update event trigger failed cause note {note} has no previous version")
+            return
+
+        if note.active is False and previous.active is True:
+            logger.debug(f"trigger delete event for task {task}")
+            await delete_task_event.emit(note)
+            return
+
+        # update
+        logger.debug(f"trigger update event for task {task}")
+        await update_task_event.emit(note)
 
     def cancel(self):
         """
-        cancel polling
-        :param stop_loop: _description_, defaults to False
-        :type stop_loop: bool, optional
+        Cancel polling.
+        If `self.threaded` is True, Watcher will stop the event loop on this own thread.
         """
         self.is_cancel = True
 
