@@ -22,13 +22,13 @@ class Watcher:
     def __init__(
         self,
         task_manager: TaskManager,
-        period: float = 5,
+        period: float = 5.0,
         ensure_each_poll: bool = True,
         threaded: bool = False,
     ) -> None:
         """
         :param task_manager: instance of `notion_self_management.task_manager.task_manager.TaskManager`
-        :param period: sleeping time during each poll, defaults to 5 second. This value can't be too
+        :param period: sleeping time during each poll, defaults to 5.0 second. This value can't be too
                        small in case to reach task_db's limit rate.
         :param ensure_each_poll: In order to emit correct event, Watcher will take all updated tasks
                                 and exists notes into comparison, which costs time. `ensure_each_poll`
@@ -83,10 +83,10 @@ class Watcher:
         - emit `delete_task` when task is confirmed updated and
                `task.is_active` is False while last note's is True.
         """
-        exist_task = await self.task_manager.get_task_by_id(task.task_id)
+        exist_note = await self.task_manager.get_current_note_by_task(task.task_id)
 
         # create
-        if exist_task:
+        if not exist_note:
             note = await self.task_manager.take_note(task, None)
             logger.debug(f"trigger create event for task {task}")
             await create_task_event.emit(note)
@@ -155,7 +155,6 @@ class Watcher:
     ):
         condition = start_time <= Task.update_time <= end_time
         tasks = await self.task_manager.get_tasks(condition)
-        print(tasks)
         if self.ensure:
             await asyncio.wait([self.trigger_event(t) for t in tasks])
         else:
