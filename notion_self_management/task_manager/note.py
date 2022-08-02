@@ -22,4 +22,13 @@ class Note(Task):
     version: str
     note_time: datetime
     previous: Optional[str]  # a previous version str
+
     # following: Optional[str]
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, Note):
+            return False
+        return self.task_id == __o.task_id and self.version == __o.version
+
+    def __hash__(self) -> int:
+        return hash(self.task_id + self.version)

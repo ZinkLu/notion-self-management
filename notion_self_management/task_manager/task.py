@@ -25,3 +25,11 @@ class Task:
     active: bool
     percent: int
     extras_field: Dict[str, Any]
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, Task):
+            return False
+        return self.task_id == __o.task_id
+
+    def __hash__(self) -> int:
+        return hash(self.task_id)
